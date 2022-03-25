@@ -31,7 +31,7 @@ https://jwnicoll.github.io/DataVis_CourseWork/Children-In-Poverty-Map/
 (This takes about ten seconds to load.)
 
 ### Tom Brady Charts
-I replicated the chart showing quarterback playoff wins from this artice:
+I replicated the chart showing quarterback playoff wins from this article:
 
 https://www.nytimes.com/interactive/2022/02/02/upshot/tom-brady-career-stats.html
 
