@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- set styles on the top -->
+    <style>
+        .chart-container {
+            max-width: 1050px;
+            /* border: 2px solid red; */
+            margin: 0 auto;
+            /* auto centers the div */
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+
+        svg {
+            /* border: 2px solid purple; */
+            overflow: visible;
+        }
+
+        h1 {
+            margin-left: 30px;
+            margin-bottom: 0;
+            /* border: 2px solid green; */
+        }
+
+        .x .tick line {
+            stroke: rgba(0, 0, 0, 1);
+        }
+
+        .y .tick line {
+            stroke: rgba(0, 0, 0, .1);
+        }
+
+        .x .domain {
+            display: none;
+        }
+
+        .y .domain {
+            display: none;
+        }
+
+        .y .tick text{
+            font-size: 11px;
+            fill: #43464B;
+            font-weight: 100;
+
+        }
+
+        .x .tick {
+            font-size: 11px;
+            fill: #333;
+            font-weight: 100;
+        }
+        
+        .x .tick text {
+            fill: #43464B;
+        }
+
+        .label {
+            font-family: 'Arial';
+            font-size: 13.5px;
+            font-weight: 100;
+            fill: #43464B;
+        }
+
+        #TampaTom {
+            font-family: 'Arial';
+            font-size: 25px;
+            font-weight: 'lighter';
+            fill: #43464B;
+        }
+
+        .change-btn {
+            margin: 0 auto;
+            width: 250;
+            cursor: pointer;
+        }
+    
+    </style>
+</head>
+
+<body>
+    <div class="chart-container">
+        <h1 class="headline">
+            No. 1: Playoff Wins (By Year)
+        </h1>
+        <!--Original width: 1050px, Original height: 1000px-->
+        <svg width="1050px" height="1000px">
+
+        </svg>
+        <button class="change-btn">Switch</button>
+    </div>
+</body>
+
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<!-- we're using d3 version 6 (the latest version) for all out work -->
+
+<script>
+    console.log({ d3 })
+    //https://observablehq.com/@mbostock/global-temperature-trends
+
+    let width = 800;
+    let height = 500;
+
+    let svg = d3.select("body")
+        .select("svg")
+
+    let sel_qbs = [
+        "StarBa00",
+        "BradTe00",
+        "MontJo01",
+        "TarkFr00",
+        "ElwaJo00"
+    ]
+
+    //d3.tsv("cumulative-stats.tsv").then(function (data) {
+    d3.csv("football_data_clean.csv").then(function (data) {
+        d3.json("player-lookup.json").then(function (data2) {
+
+            //d3.csv is part of a suite of other functions that can do json, xml, tsv too.  
+            //https://github.com/d3/d3-fetch
+
+            data.forEach(function (row) {
+                row.year = +row.year
+                row.playoff_wins = +row.playoff_wins 
+            })
+
+            let margin = { top: 30, right: 10, bottom: 10, left: 30 };
+            let state = "year"
+            //d3 scales for the x and y axis
+            //domain takes the data we have and maps them into SVG space
+            //in this case we need to use scaleTime because we're dealin time data
+            let x = d3.scaleTime()
+                .domain(d3.extent(data.map(function (d) { return d.year }))) //d3 extent
+                .range([margin.left, width - margin.right])
+            
+            let x2 = d3.scaleLinear()
+                 .domain(d3.extent(data.map(function (d) { return d.age }))) //d3 extent
+                 .range([margin.left, width - margin.right])
+
+            //in this case we need to use scaleLinear because we're dealin linear data
+            let y = d3.scaleLinear()
+                .domain(d3.extent(data.map(function (d) { return d.playoff_wins })))
+                .range([height - margin.bottom, margin.top])
+
+
+            //define the settings for our axes
+            //https://github.com/d3/d3-axis
+            // https://github.com/d3/d3-time-format
+            //https://github.com/d3/d3-format
+            let yAxisSettings = d3.axisRight(y) //set axis to the left
+                .ticks(5) //approx how many ticks, the function will not necesarily give you that number
+                .tickSize(width - margin.right - margin.left) //size of tick lines
+                .tickFormat(d3.format("0")) //what format do you want https://github.com/d3/d3-format 
+                .tickPadding(10) //distance from tick labels to tick marks
+                
+
+
+            let xAxisSettings = d3.axisBottom(x)
+                .ticks(10)
+                .tickSize(7)
+                .tickPadding(5)
+                .tickFormat(d3.format("0"))
+            
+            // let x2AxisSettings = d3.axisBottom(x2)
+            //     .ticks(10)
+            //     .tickSize(10)
+            //     .tickPadding(5)
+            //     .tickFormat(d3.format("0"))
+
+            // let y2AxisSettings = d3.axisRight(y) //set axis to the left
+            //     .ticks(5) //approx how many ticks, the function will not necesarily give you that number
+            //     .tickSize(x2(44) - margin.left) //size of tick lines
+            //     .tickFormat(d3.format("0")) //what format do you want https://github.com/d3/d3-format 
+            //     .tickPadding(10) //distance from tick labels to tick marks
+
+            //adding to the axes to our chart
+            let xAxisTicks = svg.append("g")
+                .attr("class", "x axis") //give each axis a class
+                .call(xAxisSettings)
+                .attr("transform", `translate(0,${height - margin.bottom})`)
+
+
+            let yAxisTicks = svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxisSettings)
+                .attr("transform", `translate(${margin.left},0)`)
+
+            let line = d3.line() //define a line function
+                .defined(d => !isNaN(d.playoff_wins))
+                .x(function (d) { return x(d.year) }) //accessing date 
+                .y(function (d) { return y(d.playoff_wins) }) //accesssing value 
+
+             let line2 = d3.line()
+             .defined(d => !isNaN(d.playoff_wins))
+                .x(function (d) { return x2(d.age) }) //accessing date 
+                .y(function (d) { return y(d.playoff_wins) }) //accesssing value 
+
+
+            
+            let grouped_data = d3.group(data, d => d.player_id);
+            console.log(grouped_data)
+
+            //let agencies = Array.from(grouped_data.keys())
+
+            let line_path = svg.append("g")
+            .selectAll(".line")
+            .data(grouped_data)
+            .join("path")
+            .attr("class", function(d) {
+                return "line " +  d[0]
+            })
+            .attr("d", function(d, data2) {
+                return line(d[1])//line(d[0],d[1], data2) // altered this from line(d[1])
+            })
+            .attr("class", d => {
+                if (d[0] == "BradTo00" | sel_qbs.indexOf(d[0]) != -1 | data2[d[0]][`year_end`] == 2021) {
+                    return "raiseline"
+                }
+                else {
+                    return ""
+                }
+            })
+            .style("fill", "none")
+            .style("stroke", d => {
+                if(d[0] == "BradTo00" | data2[d[0]][`year_end`] == 2021) {
+                    return d3.rgb(96, 182, 249)//"#48b4e0"
+                } else if (sel_qbs.indexOf(d[0]) != -1) {
+                    return "black"
+                } else {
+                    return "#ccc"
+                }
+            })
+            .style("stroke-width", d => {
+                if(d[0] == "BradTo00") {
+                    return "4px"
+                }
+                else {
+                    return "1px"
+                }
+            })
+
+            d3.selectAll(".raiseline")
+                .raise()
+
+            let pts = svg.append("g")
+                .selectAll(".points")
+                .data(grouped_data)
+                .join("circle")
+                .attr("cx", d => x(d[1][d[1].length - 1].year))//x(d[1][d[1].length - 1].year))
+                .attr("cy", d => y(d[1][d[1].length - 1].playoff_wins))
+                .attr("r", d => {
+                    if (d[0] == "BradTo00") {
+                        return 5
+                    } else {
+                        return 1.5
+                    }
+                })
+                .attr("class", "points")
+                // .style("stroke", "#444")
+                // .style("stroke-width", .2)
+                .style("fill", d => {
+                    if(d[0] == "BradTo00" | data2[d[0]][`year_end`] == 2021) {
+                        return d3.rgb(96, 182, 249)//"#48b4e0"
+                    } else if (sel_qbs.indexOf(d[0]) != -1) {
+                        return "black"
+                    } else {
+                        return "#ccc"
+                    }
+                })
+
+            let labels = svg.append("g")
+                .selectAll("text")
+                .data(grouped_data)
+                .join("text")
+                .attr("x", d => x(d[1][d[1].length - 1].year))
+                .attr("y", d => y(d[1][d[1].length - 1].playoff_wins))
+                .attr("dx", d =>  {
+                    if(d[0] == "BradTo00") {
+                        return -55
+                    }
+                    else if (sel_qbs.indexOf(d[0]) != -1) {
+                        return 5
+                    }
+                    else {
+                        return 0
+                    }
+                })
+                .attr("dy", d =>  {
+                    if(d[0] == "BradTo00") {
+                        return -15
+                    }
+                    else if (sel_qbs.indexOf(d[0]) != -1) {
+                        return 3
+                    }
+                    else {
+                        return 0
+                    }
+                })
+                .text(d =>  {
+                    if(d[0] == "BradTo00" | sel_qbs.indexOf(d[0]) != -1) {
+                        return data2[d[0]][`last_name`]
+                    }
+                    else {
+                        return ""
+                    }
+                })
+                .style("stroke-width", d => {
+                    if(d[0] == "BradTo00" | sel_qbs.indexOf(d[0]) != -1) {
+                        return 0.2
+                    } else {
+                        return "none"
+                    }
+                })
+                .attr("class", d => {
+                    if (sel_qbs.indexOf(d[0]) != -1) {
+                        return "label"
+                    }
+                    else {
+                        return ""
+                    }
+                })
+                .attr("id", d => {
+                    if (d[0] == "BradTo00") {
+                        return "TampaTom"
+                    }
+                    else {
+                        return ""
+                    }
+                })
+                .style("fill", "#43464B")
+                .style("font-weight", d => {
+                    if (sel_qbs.indexOf(d[0]) != -1) {
+                        return "lighter"
+                    }
+                    else {
+                        return ""
+                    }
+                })
+            
+            let baseline = svg.append("line")
+                .attr("x1", margin.left)
+                .attr("x2", width - margin.right)
+                .attr("y1", y(0))
+                .attr("y2", y(0))
+                .style("stroke", "black")
+                .style("stroke-width", "1.3px")
+            
+            //let button = d3.select(".change-btn").on("click", update(grouped_data))
+            // function update(grouped_data) {
+            //     if (state == "age") {
+            //         state = "year"
+            //         d3.selectAll("circles")
+            //             .data(grouped_data)
+            //             .transition()
+            //             .attr("cx", d => x(d[1][d[1].length - 1].year))
+            //     }
+            //     else {
+            //         state = "age"
+            //         d3.selectAll("circles")
+            //             .data(grouped_data)
+            //             .transition()
+            //             .attr("cx", d => x2(d[1][d[1].length - 1].age))
+            //     }
+            // }
+        })
+    })
+
+</script>
