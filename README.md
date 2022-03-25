@@ -24,11 +24,12 @@ The same chart that I re-engineered in a scrollytelling rig is here:
 https://jwnicoll.github.io/DataVis_CourseWork/Healthcare-Scrollytelling/
 
 ### US Map
-Here is an interactive map showing the number of children in poverty by county in the United States:
+Here is an interactive map showing the estimated number of children in poverty
+in 2019 by county in the United States:
 
 https://jwnicoll.github.io/DataVis_CourseWork/Children-In-Poverty-Map/
 
-(This takes about ten seconds to load.)
+(Data is from the Census. This takes about ten seconds to load.)
 
 ### Tom Brady Charts
 I replicated the chart showing quarterback playoff wins from this article:
