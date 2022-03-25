@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .chart-container {
+            max-width: 1050px;
+            margin: 0 auto;
+            /* auto centers the div */
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+
+        svg {
+            /* border: 2px solid purple; */
+            overflow: visible;
+            display: block;
+            margin: auto;
+        }
+
+        /*  button { */
+             /* width: 100px;
+             background-color: none; */
+         /* } */
+        .toggle{
+            width: 75px;
+        }
+
+        .full-chart {
+            background-color: #ccc;
+            width: 125px;
+        }
+
+        .age-toggle{
+            width: 59px;
+        }
+
+        svg .y.axis .tick line {
+            display: none;
+        }
+
+        svg .y.axis .tick text {
+            font-size: 14px;
+        }
+
+        svg .x.axis .tick text {
+            font-size: 14px;
+        }
+
+        svg .y.axis .domain {
+            display: none;
+        }
+
+        svg .x.axis .domain {
+            display: none;
+        }
+
+        h1 {
+            margin-left: 30px;
+            text-align: center;
+            font-size: 35px;
+            font-family: serif;
+        }
+        h2 {
+            margin-left: 30px;
+            font-size: 25px;
+            text-align: center;
+            font-family: serif;
+        }
+        h3 {
+            /* margin-left: 105px; */
+            text-align: center;
+            font-family: serif;
+            font-size: 20px;
+        }
+
+        .source {
+            margin-top: 30px;
+            margin-left: 100px;
+            color: rgb(48, 47, 47);
+            font-size: 11px;
+            text-align: center;
+            color: gray;
+            font-family: serif;
+        }
+
+        .horizontal-spacer {
+            width: 50px;
+            display: inline-block;
+        }
+
+        /* .highlight {
+            text-decoration: underline;
+            color: darkblue;
+        } */
+        .spacer {
+            height: 30px;
+        }
+        .annotation {
+            opacity: 0;
+            font-size: 16px;
+            font-family: serif;
+        }
+
+        #noteOne {
+            position: absolute; 
+            left: 250px;
+            top: 200px;
+            /* border: 1px solid black;
+            border-radius: 1px;
+            line-height: 1.2; */
+            width: 200px;
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 0;
+        }
+
+        #noteTwo {
+            position: absolute; 
+            left: 250px;
+            top: 200px;
+            /* border: 1px solid black;
+            border-radius: 1px;
+            line-height: 1.2; */
+            width: 150px;
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 0;
+        }
+
+        #noteAll {
+            position: absolute; 
+            left: 250px;
+            top: 200px;
+            /* border: 1px solid black;
+            border-radius: 1px;
+            line-height: 1.2; */
+            width: 400px;
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+        }
+
+        #noteAll2 {
+            position: absolute; 
+            left: 600px;
+            top: 400px;
+            /* border: 1px solid black;
+            border-radius: 1px;
+            line-height: 1.2; */
+            width: 125px;
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+        }
+
+        #noteThree {
+            position: absolute; 
+            left: 600px;
+            top: 400px;
+            /* border: 1px solid black;
+            border-radius: 1px;
+            line-height: 1.2; */
+            width: 430px;
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 0;
+        }
+
+        /* .noteGrade {
+            position: absolute; 
+            left: 250px;
+            top: 200px;
+            /* border: 1px solid black; */
+            /* border-radius: 1px; */
+            /* line-height: 1.2;
+            max-width: 400px;
+            pointer-events: none;
+            /* background-color: white;
+            padding: 10px;
+            opacity: 1;
+            font-size: 19px;
+            font-weight: bold;
+        } */
+
+        .axis-label {
+            /* position: absolute;  */
+            /* left: 250px;
+            top: 200px; */
+            /* border: 1px solid black; */
+            /* border-radius: 1px; */
+            /* line-height: 1.2; */
+            font-size: 13px;
+            width: 50px;
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+            /* left: 140px; */
+            color: dimgray;
+            font-family: serif;
+        }
+        #high {
+            position: absolute; 
+            /* left: 100px; */
+            /* top: 150px; */
+            /* border: 1px solid black; */
+            /* border-radius: 1px; */
+            /* line-height: 1.2; */
+            /* width: 50px; */
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+        }
+
+        #low {
+            position: absolute; 
+            /* left: 100px; */
+            /* top: 530px; */
+            /* border: 1px solid black; */
+            /* border-radius: 1px; */
+            /* line-height: 1.2; */
+            /* width: 50px; */
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+        }
+
+        #average {
+            position: absolute; 
+            /* left: 100px; */
+            /* top: 272px; */
+            /* border: 1px solid black; */
+            /* border-radius: 1px; */
+            /* line-height: 1.2; */
+            /* width: 50px; */
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+        }
+
+        .arrow {
+            font-size: 20px;
+            padding: 10px;
+            opacity: 1;
+            /* left: 155px; */
+            /* font-weight: bold; */
+        }
+
+        g .tick {
+            font-size: 13px;
+            max-width: 30px;
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+            /* left: 140px; */
+            color: dimgray;
+            font-family: serif;
+        }
+
+        #up {
+            position: absolute; 
+            /* left: 100px; */
+            /* top: 120px; */
+            /* border: 1px solid black; */
+            /* border-radius: 1px; */
+            /* line-height: 1.2; */
+            /* width: 50px; */
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+        }
+        
+        #down {
+            position: absolute; 
+            /* left: 100px; */
+            /* top: 585px; */
+            /* border: 1px solid black; */
+            /* border-radius: 1px; */
+            /* line-height: 1.2; */
+            /* width: 50px; */
+            pointer-events: none;
+            /* background-color: white; */
+            padding: 10px;
+            opacity: 1;
+        }
+        .buttons {
+            margin-left: 103px;
+            font-family: serif;
+            /* display: block; */
+        }
+
+        /* .cutoff {
+            border: none;
+            border-top: 3px dotted black;
+            width: 1px;
+        } */
+
+    </style>
+</head>
+
+<body>
+    <div class="chart-container">
+        <h1 class="headline">
+            Illustrating The August Birth Penalty
+        </h1>
+        <h2 class="subhead">
+            Younger male students in the UK struggle to catch up to their peers.
+        </h2>
+        <h3 class="ageSubhead">
+            SAT Scores at Age 7
+        </h3>
+        <svg width="900px" height="500px">
+
+        </svg>
+        <div class="spacer"></div>
+        <div class="buttons">
+            <button class="change-prev toggle">Prev</button>
+            <button class="change-next toggle">Next</button>
+            <div class="horizontal-spacer"></div>
+            <button class="full-chart">All Age Groups</button>
+            <button class="change-ks1 age-toggle">Age 7</button>
+            <button class="change-ks2 age-toggle">Age 11</button>
+            <button class="change-ks3 age-toggle">Age 14</button>
+        </div>
+        <div class="source">Note: Test scores for 7, 11, and 14 year olds are based on Key Stage 1, 2, and 3, respectively. Key Stage SATs assess students' math and English skills.<br>Source: English National Pupil Database (NPD); The Institute for Fiscal Studies.</div>
+    </div>
+    <div class="annotation" id="noteOne">
+    </div>
+    <div class="annotation" id="noteTwo"></div>
+    <div class="annotation" id="noteAll"></div>
+    <div class="annotation" id="noteAll2"></div>
+    <!--div class="annotation noteGrade" id="noteGrade1"--><!--/div-->
+    <div class="annotation" id="noteThree"></div>
+    <div class="axis-label" id="high"></div>
+    <div class="axis-label" id="low"></div>
+    <div class="axis-label" id="average"></div>
+    <div class="arrow" id="up"></div>
+    <div class="arrow" id="down"></div>
+</body>
+
+<!-- add your script blocks at the end -->
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<!-- we're using d3 version 6 (the latest version) for all out work -->
+
+<script>
+    // All children, regardless of age, start school in the September of the academic year in which they turn 5.
+    let width = 1050;
+    let height = 500;
+
+    let delta = 5000;
+    let duration = 900;
+
+    d3.select("#high").html("Higher Test Scores")
+    d3.select("#low").html("Lower Test Scores")
+    d3.select("#up").html("&#x2191")
+    d3.select("#down").html("&#x2193")
+    d3.select("#average").html("Average")
+
+    let svg = d3.select("body").select("svg")
+
+    // aspectRatio = 10/16
+    // width = svg.node().getBoundingClientRect().width/1.2
+    // height = aspectRatio * width
+
+    width = svg.node().getBoundingClientRect().width
+    height = svg.node().getBoundingClientRect().height
+
+    d3.csv("all_data_year.csv").then(function (data) {
+
+        data.forEach(function (row) {
+            row.dateObject = new Date( row.dateObject)
+            row.Score = +row.Score
+        })
+
+
+        let datamale = [...data].filter(d => d.Gender == "Male")
+        let datayear = [...datamale].filter(d => d.Year == "1991")
+
+        let form_state = 1;
+        let all_state = true;
+
+        let dataKS1 = [...datayear].filter(d => d.Form == 'KS1')
+        let dataKS2 = [...datayear].filter(d => d.Form == 'KS2')
+        let dataKS3 = [...datayear].filter(d => d.Form == 'KS3')
+
+        // console.log(dataKS1)
+
+        let margin = { top: 10, right: 10, bottom: 10, left: 30 };
+        
+        let x = d3.scaleBand()
+            .domain(dataKS1.map(d => d.dateObject))
+            .paddingInner(.2)
+            .paddingOuter(.2)
+            .range([margin.left, width - margin.right])
+        
+        let y = d3.scaleLinear()
+            .domain(d3.extent(datayear.map(function (d) { return d.Score })))
+            .range([height - margin.bottom, margin.top])
+
+        let noteall = "The oldest students in the grade outperform their younger counterparts across all age groups."
+        let noteall2 = "Children born after <strong>September 1<sup>st</sup></strong> begin school the following year."
+        // let note1 = "Children begin school in the academic year in which they turn 5, so September-born children are a full year older than their August-born classmates."
+        let note1exp = "September 1<sup>st</sup> cutoff date."
+        let note1 = 'At <strong>age 7,</strong> relative age differences severely impact standardized test scores, creating the "August birth penalty."'
+        let note2 = "The performance gap diminishes greatly by <strong>age 11,</strong> as the proportional age difference of students decreases."
+        let note3 = "The gap remains approximately constant from age 11 to <strong>age 14,</strong> suggesting that the August birth penalty has persisting consequences."
+        let note3exp = "September-born children perform the best across all age groups, while August-born children perform the worst."
+
+        let sub1 = "SAT Scores at Age 7"
+        let sub2 = "SAT Scores at Age 11"
+        let sub3 = "SAT Scores at Age 14"
+
+        let figx = svg.node().getBoundingClientRect().x
+        let figy = svg.node().getBoundingClientRect().y
+        let figwidth = svg.node().getBoundingClientRect().width
+        let figheight = svg.node().getBoundingClientRect().height
+
+        // console.log(figx)
+        // console.log(figy)
+        // console.log(figwidth)
+        // console.log(figheight)
+
+        // d3.select("#up").style("top", String(figy - 0.01*figheight) + "px")
+        // d3.select("#down").style("top", String(figy + 0.915*figheight) + "px")
+        // d3.select("#high").style("top", String(figy + 0.05*figheight) + "px")
+        // d3.select("#average").style("top", String(figy + 0.293*figheight) + "px")
+        // d3.select("#low").style("top", String(figy + 0.81*figheight) + "px")
+        // d3.selectAll(".axis-label").style("left", String(figx - 0.046*figwidth) + "px")
+        // d3.selectAll(".arrow").style("left", String(figx - 0.029*figwidth) + "px")
+
+        let gradeLevel1 = "SAT Scores, Age 7"
+        let gradeLevel2 = "SAT Scores, Age 11"
+        let gradeLevel3 = "SAT Scores, Age 14"
+        
+        let note1expleft = String(x(new Date("12/15/1991"))) + "px"//String(figx + 0.7097*figwidth) + "px"//"820px"
+        let note1exptop = String(y(-0.38)) + "px"//String(figy + 0.5478*figheight) + "px"//"400px"
+
+        let note1left = String(x(new Date("4/15/1991"))) + "px"//String(figx + 0.0652*figwidth) + "px"//"240px"
+        let note1top = String(y(-0.06)) + "px"//String(figy + 0.0478*figheight) + "px"//"150px"
+        
+        let note3expleft = String(x(new Date("6/15/1991"))) + "px"//String(figx + 0.3541*figwidth) + "px"//"500px"
+        let note3exptop = String(y(-0.05)) + "px"//String(figy + 0.0378*figheight) + "px"//"145px"
+
+        let note3left = String(x(new Date("7/15/1991"))) + "px"//String(figx + 0.3541*figwidth) + "px"//"500px"
+        let note3top = String(y(-0.45)) + "px"//String(figy + 0.6478*figheight) + "px"//"450px"
+
+        let note2left = String(x(new Date("8/15/1991"))) + "px"//String(figx + 0.4097*figwidth) + "px"//"550px"
+        let note2top = String(y(-0.47)) + "px"//String(figy + 0.6978*figheight) + "px"//"475px"
+
+        let noteallleft = String(x(new Date("05/8/1991"))) + "px"//String(figx + 0.0874*figwidth) + "px"//"260px"
+        let notealltop = String(y(-0.06)) + "px" //String(figy + 0.1078*figheight) + "px"//"180px"
+
+        let noteall2left = String(x(new Date("12/15/1991"))-20) + "px"//String(figx + 0.6874*figwidth) + "px"//"800px"
+        let noteall2top = String(y(-0.32)) + "px"//String(figy + 0.4478*figheight) + "px"//"350px"
+
+        let gradeLevelLeft = String(x(new Date("12/15/1991")) + 105) + "px"//String(figx + 0.0874*figwidth) + "px"//"260px"
+        let gradeLevelTop = String(y(-0.01)) + "px"//String(figy + 0.8478*figheight) + "px"//"550px"
+
+        d3.select("#noteOne").html(note1)
+            .style("left", note1left)
+            .style("top", note1top)
+
+        d3.select("#noteTwo").html(note1exp)
+            .style("left", note1expleft)
+            .style("top", note1exptop)
+            
+        d3.select("#noteThree").html(note3exp)
+            .style("left", note3expleft)
+            .style("top", note3exptop)
+        
+        d3.select("#noteAll").html(noteall)
+            .style("left", noteallleft)
+            .style("top", notealltop)
+        
+        d3.select("#noteAll2").html(noteall2)
+            .style("left", noteall2left)
+            .style("top", noteall2top)
+
+        // d3.select("#noteGrade1").html(gradeLevel1)
+        //     .style("left", gradeLevelLeft)
+        //     .style("top", gradeLevelTop)
+        //     .style("opacity", "0")
+        
+        d3.select("#up").style("top", String(y(-0.01)) + "px")
+        d3.select("#down").style("top", String(y(-0.628)) + "px")
+        d3.select("#high").style("top", String(y(-0.048)) + "px")
+        d3.select("#average").style("top", String(y(-0.217)) + "px")
+        d3.select("#low").style("top", String(y(-0.568)) + "px")
+        d3.selectAll(".axis-label").style("left", String(figx - 0.038*figwidth) + "px")
+        d3.selectAll(".arrow").style("left", String(figx - 0.021*figwidth) + "px")
+
+        let xAxisSettings = d3.axisBottom(x)
+            // .tickValues([.02,.04,.06])
+            // .ticks(6)
+            .tickSize(10) //size of tick 
+            .tickFormat(d3.timeFormat("%b"))
+            // .tickFormat(d3.timeFormat("%b %y")) //what format do you want https://github.com/d3/d3-format 
+            .tickPadding(10) //distance from tick labels to tick marks
+
+        // let sel_coors = [0.21, 0.17, 0, -0.39, -0.42];
+        // let sel_labs = [d3.select("#up").html(), d3.select("#high").html(), "Average", "Lower Test Scores", d3.select("#down").html()]
+        // let rescale = d3.scaleOrdinal()
+        //     .domain(sel_coors)
+        //     .range(sel_labs)
+        // let yAxisSettings = d3.axisLeft(y)
+        //     .tickValues(sel_coors)
+        //     .tickFormat(rescale)
+        // //     .ticks(10)
+        // //     .tickSize(-width)
+        //     .tickPadding(10)
+        // // let yAxis = d3.axisLeft(y)
+        
+        // svg.append("g")
+        //     .attr("id", "y-axis")
+        //     .call(yAxis)
+
+        // let xAxisTicks = svg.append("g")
+        //     .attr("class", "x axis")
+        //     .call(xAxisSettings)
+        //     .attr("transform", `translate(0,${height - margin.bottom})`)
+
+        // let yAxisTicks = svg.append("g")
+        //     .attr("class", "y axis")
+        //     .call(yAxisSettings)
+        //     .attr("transform", `translate(${margin.left},0)`)
+
+        // let yAxisTicks2 = svg.append("g")
+        //     .attr("class", "y axis")
+        //     .call(yAxisSettings2)
+        //     .attr("transform", `translate(${margin.left},0)`)
+
+        let bars = svg.append("g")
+            .attr("class", "bars")
+
+        let bar;
+        let hed = d3.select(".headline");
+
+        let buttonFull = d3.select(".full-chart").on("click", updateFullButton);
+
+        let buttonPrev = d3.select(".change-prev").on("click", updatePrev);
+        let buttonNext = d3.select(".change-next").on("click", updateNext);
+
+        let button1 = d3.select(".change-ks1").on("click", updateOneButton);
+        let button2 = d3.select(".change-ks2").on("click", updateTwoButton);
+        let button3 = d3.select(".change-ks3").on("click", updateThreeButton);
+
+        let bg = svg.append("rect")
+            .attr("x", margin.left)
+            .attr("y", 0)
+            .attr("width", width)
+            .attr("height", height)
+            .style("fill", "rgba(0,0,0,.04)")
+
+        let baseline = svg.append("line")
+            .attr("x1", margin.left)
+            .attr("x2", width + margin.left)
+            .attr("y1", y(0))
+            .attr("y2", y(0))
+            .style("stroke", "black")
+            .style("stroke-width", "2px")
+
+        let criticalDate = svg.append("line")
+            .attr("x1", x(new Date("9/15/1991")) - 6)
+            .attr("x2", x(new Date("9/15/1991")) - 6)
+            .attr("y1", 0)
+            .attr("y2", height)
+            .style("stroke", "#71797E")
+            .style("stroke-width", "0px")
+            .attr("class", "cutoff")
+            .style("stroke-dasharray", ("4, 4"))
+        
+        let criticalDateLabel = svg.append("line")
+            .attr("x1", x(new Date("9/15/1991")) - 6)
+            .attr("x2", x(new Date("9/15/1991")) + 33)
+            .attr("y1", y(-0.135))
+            .attr("y2", y(-0.16))
+            .style("stroke", "black")
+            .style("stroke-width", "0px")
+            .attr("class", "cutoffLabel")
+        
+        let maxScore = svg.append("line")
+            .attr("x1", margin.left)
+            .attr("x2", margin.left + width)
+            .attr("y1", y(d3.max(dataKS1.map(function (d) { return d.Score }))))
+            .attr("y2", y(d3.max(dataKS1.map(function (d) { return d.Score }))))
+            .style("stroke", "#71797E")
+            .style("stroke-width", "0px")
+            .attr("class", "max")
+            .style("stroke-dasharray", ("4, 4"))
+
+        let minScore = svg.append("line")
+            .attr("x1", margin.left)
+            .attr("x2", margin.left + width)
+            .attr("y1", y(d3.min(dataKS1.map(function (d) { return d.Score }))))
+            .attr("y2", y(d3.min(dataKS1.map(function (d) { return d.Score }))))
+            .style("stroke", "#71797E")
+            .style("stroke-width", "0px")
+            .attr("class", "min")
+            .style("stroke-dasharray", ("4, 4"))
+
+        bars
+            .selectAll(".bar")
+            .data(dataKS1, d => d.dateObject)
+            .join("rect")
+            .attr("class", "bar")
+            .attr("y", d => y(Math.max(0, d.Score)))
+            .attr("height", d => Math.abs(y(d.Score) - y(0)))
+            .attr("x", d => x(d.dateObject))
+            .attr("width", x.bandwidth)
+            .style("fill", "lightblue")
+            // .style("fill", "#89CFF0")
+        
+        let labs = svg.append("g")
+            .selectAll("text")
+            .data(dataKS1)
+            .join("text")
+            .attr("x", d => x(d.dateObject))
+            .attr("y", d => y(d.Score))
+            .attr("dx", 15)
+            .attr("dy", function(d) {
+                    if (d.dateObject > new Date("8/20/91")) {
+                        return 15
+                    }
+                    else {
+                        return -7
+                    }
+                })
+            .text(d => d3.timeFormat("%b")(d.dateObject))
+            .attr("class", "monthLabel")
+            .attr("font-size", "14px")
+        
+        function updateButtonTone(name) {
+            d3.selectAll("button").style("background-color", "revert")
+            d3.select(name).style("background-color", "#ccc")
+        }
+        
+        function updateOne() {
+            form_state = 1
+            dance(dataKS1)
+            // hed.html("August Birth Penalty, <span class='highlight'>KS1</span>")
+            // d3.selectAll(".annotation").style("opacity", "0")
+            // d3.select("#ks1-note").style("opacity", "1")
+            d3.select("#noteOne").html(note1)
+                .transition()
+                .duration(duration)
+                .style("left", note1left)
+                .style("top", note1top)
+                .style("width", "450px")
+            if (all_state == false) {
+                d3.select("#noteOne")
+                    .style("opacity", "1")
+                    // .style("width", "400px")
+                d3.select("#noteTwo")
+                    .style("opacity", "1")
+                    .style("width", "100px")
+                d3.select("#noteAll")
+                    .style("opacity", "0")
+                d3.select("#noteAll2")
+                    .style("opacity", "0")
+                d3.select(".cutoff")
+                    .style("stroke-width", "1px")
+                d3.select(".cutoffLabel")
+                    .style("stroke-width", "0.5px")
+                d3.select(".max")
+                    .style("stroke-width", "0px")
+                d3.select(".min")
+                    .style("stroke-width", "0px")
+                d3.select("#noteThree")
+                .style("opacity", "0")
+            }
+            // d3.select("#noteGrade1").html(gradeLevel1)
+            d3.select(".ageSubhead").html(sub1)
+        }
+
+        function updateTwo() {
+            form_state = 2
+            dance(dataKS2)
+            // hed.html("August Birth Penalty, <span class='highlight'>KS2</span>")
+            d3.select("#noteOne").html(note2)
+                .transition()
+                .duration(duration)
+                .style("left", note2left)
+                .style("top", note2top)
+                .style("width", "200px")
+            if (all_state == false) {
+                d3.select("#noteOne")
+                    .style("opacity", "1")
+                    .style("width", "200px")
+                d3.select("#noteTwo")
+                    .style("opacity", "0")
+                d3.select("#noteAll")
+                    .style("opacity", "0")
+                d3.select("#noteAll2")
+                    .style("opacity", "0")
+                d3.select(".cutoff")
+                    .style("stroke-width", "0px")
+                d3.select(".cutoffLabel")
+                    .style("stroke-width", "0px")
+                d3.select(".max")
+                    .style("stroke-width", "1px")
+                d3.select(".min")
+                    .style("stroke-width", "1px")
+                d3.select("#noteThree")
+                    .style("opacity", "0")
+            }
+            d3.select("#noteTwo")
+                .style("opacity", "0")
+            // d3.select("#noteGrade1").html(gradeLevel2)
+            d3.select(".ageSubhead").html(sub2)
+        }
+
+        function updateThree() {
+            form_state = 3
+            dance(dataKS3)
+            // hed.html("August Birth Penalty, <span class='highlight'>KS3</span>")
+            d3.select("#noteOne").html(note3)
+                .transition()
+                .duration(duration)
+                .style("left", note3left)
+                .style("top", note3top)
+                .style("width", "400px")
+            if (all_state == false) {
+                d3.select("#noteOne")
+                    .style("opacity", "1")
+                d3.select("#noteTwo")
+                    .style("opacity", "0")
+                d3.select("#noteAll")
+                    .style("opacity", "0")
+                d3.select("#noteAll2")
+                    .style("opacity", "0")
+                d3.select(".cutoff")
+                    .style("stroke-width", "0px")
+                d3.select(".cutoffLabel")
+                    .style("stroke-width", "0px")
+                d3.select(".max")
+                    .style("stroke-width", "1px")
+                d3.select(".min")
+                    .style("stroke-width", "1px")
+                d3.select("#noteThree")
+                    .style("opacity", "1")
+            }
+            d3.select("#noteTwo")
+                .style("opacity", "0")
+            // d3.select("#noteGrade1").html(gradeLevel3)
+            d3.select(".ageSubhead").html(sub3)
+        }
+
+        function updateOneButton() {
+            timer.stop()
+            all_state = false
+            updateButtonTone(".change-ks1")
+            updateOne()
+        }
+
+        function updateTwoButton() {
+            timer.stop()
+            all_state = false
+            updateButtonTone(".change-ks2")
+            updateTwo()
+        }
+
+        function updateThreeButton() {
+            timer.stop()
+            all_state = false
+            updateButtonTone(".change-ks3")
+            updateThree()
+        }
+
+        function updateFull() {
+            all_state = true
+            updateOne()
+            d3.selectAll(".annotation").style("opacity", 0)
+            // d3.select("#noteGrade1").style("opacity", "0")
+            d3.select("#noteAll").style("opacity", "1")
+            d3.select("#noteAll2").style("opacity", "1")
+            d3.select(".cutoff").style("stroke-width", "0px")
+            d3.select(".cutoffLabel").style("stroke-width", "0px")
+            d3.select(".max").style("stroke-width", "0px")
+            d3.select(".min").style("stroke-width", "0px")
+            d3.select("#noteThree").style("opacity", "0")
+            timer.restart(update, delta)
+        }
+
+        function updateFullButton() {
+            updateButtonTone(".full-chart")
+            updateFull()
+        }
+
+        function updateNext() {
+            if (all_state) {
+                timer.stop()
+                all_state = false
+                updateOne()
+                updateButtonTone(".change-ks1")
+            }
+            else {
+                if (form_state == 1) {
+                    timer.stop()
+                    updateTwo()
+                    updateButtonTone(".change-ks2")
+                } else if (form_state == 2) {
+                    timer.stop()
+                    updateThree()
+                    updateButtonTone(".change-ks3")
+                } else {
+                    updateFull()
+                    updateButtonTone(".full-chart")
+                }
+            }
+        }
+
+        function updatePrev() {
+            if (all_state) {
+                all_state = false
+                timer.stop()
+                updateThree()
+                updateButtonTone(".change-ks3")
+            }
+            else {
+                if (form_state == 1) {
+                    updateFull()
+                    updateButtonTone(".full-chart")
+                } else if (form_state == 2) {
+                    timer.stop()
+                    updateOne()
+                    updateButtonTone(".change-ks1")
+                } else {
+                    timer.stop()
+                    updateTwo()
+                    updateButtonTone(".change-ks2")
+                }
+            }
+        }
+
+        function update() {
+            timer.restart(update, delta)
+            if (form_state == 1) {
+                updateTwo()
+            } else if (form_state == 2) {
+                updateThree()
+            } else {
+                updateOne()
+            }
+        }
+        let transitionType = d3.easeSin;
+        function dance(filtered_data) {
+            // y = d3.scaleLinear()
+            //     .domain(d3.extent(filtered_data.map(function (d) { return d.Score })))
+            //     .range([height - margin.bottom, margin.top])
+            // var newY = d3.axisLeft(y)
+            // svg.select("#y-axis")
+            // .transition()
+            // .call(newY)
+            bars
+                .selectAll(".bar")
+                .data(filtered_data, d => d.dateObject)
+                .join("rect")
+                .attr("class", "bar")
+                .transition()
+                .duration(duration)
+                .ease(transitionType)
+                .attr("y", d => y(Math.max(0, d.Score)))
+                .attr("height", d => Math.abs(y(d.Score) - y(0)))
+                .attr("x", d => x(d.dateObject))
+                .attr("width", x.bandwidth)
+                // .style("fill", "lightblue")
+                // .style("fill")
+            d3
+                .selectAll(".monthLabel")
+                .data(filtered_data, d => d.dateObject)
+                .transition()
+                .duration(duration)
+                .ease(transitionType)
+                .attr("x", d => x(d.dateObject))
+                .attr("y", function (d) {
+                    if (d.dateObject.getMonth() == 1 & Math.abs(y(d.Score) - y(0)) < 50) {
+                        return y(-0.025)
+                    }
+                    else if (d.dateObject.getMonth() == 0 & Math.abs(y(d.Score) - y(0)) < 30) {
+                        return y(-0.025)
+                    }
+                    else if (d.dateObject.getMonth() == 11 & Math.abs(y(d.Score) - y(0)) < 10) {
+                        if (Math.abs(y(d.Score) - y(0)) < 5) {
+                            return y(0.025)
+                        }
+                        else {
+                            return y(0.038)
+                        }
+                    }
+                    else {
+                        return y(d.Score)
+                    }
+                })
+            maxScore.transition()
+                .duration(duration)
+                .ease(transitionType)
+                .attr("y1", y(d3.max(filtered_data.map(function (d) { return d.Score }))))
+                .attr("y2", y(d3.max(filtered_data.map(function (d) { return d.Score }))))
+            minScore.transition()
+                .duration(duration)
+                .ease(transitionType)
+                .attr("y1", y(d3.min(filtered_data.map(function (d) { return d.Score }))))
+                .attr("y2", y(d3.min(filtered_data.map(function (d) { return d.Score }))))
+            
+        }
+
+        var timer = d3.timer(update, delta) //in milliseconds
+        // var makeCallback = function() {
+        //     return function () {
+        //         update()
+        //         d3.timer(makeCallback(), 3000)
+        //         timer.stop()
+        //         return true
+        //     }
+        // }
+        // function t1() {
+        //     d3.timer
+        // }
+        // d3.timer(makeCallback(), 3000)
+    })
+
+</script>
